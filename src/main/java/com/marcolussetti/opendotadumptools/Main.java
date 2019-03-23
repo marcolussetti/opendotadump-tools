@@ -1,4 +1,4 @@
-package com.marcolussetti.processopendota;
+package com.marcolussetti.opendotadumptools;
 
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
@@ -32,15 +32,14 @@ class ProcessOpenDota implements Callable<Void> {
             description = "Condense the input openDota CSV file. If file is GunZipped (.gz), extract it first.")
     private File condense = null;
 
-    @CommandLine.Parameters(paramLabel = "OUTPUT",
+    @Parameters(paramLabel = "OUTPUT",
             description = "Output file for either extract or condense")
-    private File output;
-
+    private File output = null;
 
     // CONSTANTS
     public static final int MATCHES_NO = 1191768403;
     public static final int DAYS_NO = 1859;
-    public static final int REPORT_THRESHOLD = 100000; // Report progress every 100K rows
+    public static final int REPORT_THRESHOLD = 250000; // Report progress every 250K rows
     public static final int SERIALIZE_THRESHOLD = 1000000; // Serialize every million rows
 
     // VARIABLES
@@ -50,8 +49,6 @@ class ProcessOpenDota implements Callable<Void> {
     private int recordCounter = 0;
     // Store the data {date: Long, {hero#: int -> picks# int}}
     private THashMap<Long, THashMap<Integer, Integer>> data = new THashMap<>();
-
-
 
     private void condenseInputFile(File input, File output) {
         this.startOfParsing = LocalDateTime.now();
@@ -73,18 +70,15 @@ class ProcessOpenDota implements Callable<Void> {
 
                     if (recordCounter % SERIALIZE_THRESHOLD == 0) {
                         String destFolder = output.getParent();
-                        String[] destFile = output.getName().split(".");
+                        String[] destFile = output.getName().split("\\.");
+                        File outputFile = new File(destFolder + File.separator + destFile[0] + "_" + (recordCounter / SERIALIZE_THRESHOLD) + "." + destFile[1]);
 
-                        String serializePath = output.getParent() + "intermediate_" + (recordCounter % SERIALIZE_THRESHOLD) + ".ser";
-                        serializeData(data, serializePath);
+                        serializeData(data, outputFile);
                     }
                 }
             }
 
-            String serializePath = outputPath + "final_" + (recordCounter % SERIALIZE_THRESHOLD) + ".ser";
-            serializeData(data, serializePath);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            serializeData(data, output);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,7 +88,7 @@ class ProcessOpenDota implements Callable<Void> {
     private void extractToJson(File input, File output) {
         THashMap<Long, THashMap<Integer, Integer>> hashMap = deserializeData(input);
 
-        writeJSON(hashMap, outputPath + "output.json");
+        writeJSON(hashMap, output);
     }
 
     private void parseRow(String[] row) {
@@ -151,11 +145,17 @@ class ProcessOpenDota implements Callable<Void> {
     }
 
     private static void reportProgress(int recordCounter, int days, LocalDateTime startOfParsing) {
+        Duration elapsed = Duration.between(startOfParsing, LocalDateTime.now());
+        long elapsedMillis = elapsed.toMillis();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        double rowsPerSec = (double) recordCounter / elapsedMillis * 1000;
+
         System.out.printf(
-                "\n%s (%s elapsed) | %,.2f million rows (%.2f)| %4d days ()",
+                "\n%s (%s elapsed - %s remaining) | %9.2f rows/s | %,6.2f million rows (%6.2f%%)| %4d days (%6.2f%%)",
                 dtf.format(LocalDateTime.now()),
-                timeDifference(startOfParsing, LocalDateTime.now()),
+                formatTimeDifference(elapsedMillis),
+                formatTimeDifference((long) ((MATCHES_NO - recordCounter) / rowsPerSec * 1000)),
+                (double) recordCounter / elapsedMillis * 1000,
                 recordCounter / 1000000.0,
                 recordCounter / 1000000.0 / MATCHES_NO,
                 days,
@@ -163,11 +163,8 @@ class ProcessOpenDota implements Callable<Void> {
         );
     }
 
-    private static String timeDifference(LocalDateTime start, LocalDateTime end) {
+    private static String formatTimeDifference(long millis) {
         // From https://stackoverflow.com/a/44142896/6238740
-        Duration duration = Duration.between(start, end);
-        long millis = duration.toMillis();
-
         return String.format("%02d:%02d:%02d",
                 TimeUnit.MILLISECONDS.toHours(millis),
                 TimeUnit.MILLISECONDS.toMinutes(millis) -
@@ -176,11 +173,12 @@ class ProcessOpenDota implements Callable<Void> {
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
     }
 
-    private static void serializeData(THashMap<Long, THashMap<Integer, Integer>> data, String path) {
+    private static void serializeData(THashMap<Long, THashMap<Integer, Integer>> data, File output) {
+
         // From https://beginnersbook.com/2013/12/how-to-serialize-hashmap-in-java/
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(path);
+            fos = new FileOutputStream(output);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(data);
             oos.close();
@@ -188,7 +186,7 @@ class ProcessOpenDota implements Callable<Void> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("> Saved data to " + path);
+        System.out.print("\n> Saved data to " + output.getAbsolutePath());
     }
 
     public static THashMap<Long, THashMap<Integer, Integer>> deserializeData(File file) {
@@ -212,10 +210,16 @@ class ProcessOpenDota implements Callable<Void> {
         return hashMap;
     }
 
-    public static void writeJSON(THashMap<Long, THashMap<Integer, Integer>> hashMap, String path) {
+    public static void writeJSON(THashMap<Long, THashMap<Integer, Integer>> hashMap, File outputFile) {
 
         String output = JsonStream.serialize(hashMap);
-        try (PrintStream out = new PrintStream(new FileOutputStream("filename.txt"))) {
+        try {
+            outputFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (PrintStream out = new PrintStream(new FileOutputStream(outputFile))) {
             out.print(output);
             out.flush();
         } catch (FileNotFoundException e) {
@@ -372,34 +376,34 @@ class ProcessOpenDota implements Callable<Void> {
 
     }
 
-//        private static void closeSafely(Closeable closeable) {
-//            if (closeable != null) {
-//                try {
-//                    closeable.close();
-//                } catch (IOException e) {
-//                    // Ignore
-//                }
-//            }
-//        }
-
     @Override
     public Void call() throws Exception {
         // BUSINESS LOGIC
 
+        if (extractToJson == null && condense == null) {
+            System.out.println("Well you need to select something... try --help");
+            return null;
+        }
+        if (extractToJson != null && condense != null) {
+            System.out.println("Can't have it both ways... try --help");
+            return null;
+        }
         if (output == null) {
             System.out.println("Must provide an output file!");
             return null;
         }
-        if (extractToJson == null && condense == null) {
-            System.out.println("Well you need to select something... try --help");
-        }
 
         if (extractToJson != null) {
+            System.out.println("Converting from SER to JSON");
             extractToJson(extractToJson, output);
+            System.out.println("Conversion complete: " + output.getAbsolutePath());
         }
         if (condense != null) {
+            System.out.println("Condensing from CSV to SER");
             condenseInputFile(condense, output);
+            System.out.println("Condensing complete: " + output.getAbsolutePath());
         }
+
         return null;
     }
 }
