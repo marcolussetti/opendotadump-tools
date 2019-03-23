@@ -38,7 +38,7 @@ class ProcessOpenDota implements Callable<Void> {
 
     // CONSTANTS
     public static final int MATCHES_NO = 1191768403;
-    public static final int DAYS_NO = 1859;
+    public static final int DAYS_NO = 1870;
     public static final int REPORT_THRESHOLD = 1000000; // Report progress every million rows
     public static final int SERIALIZE_THRESHOLD = 10000000; // Serialize every 10 million rows
 
@@ -78,6 +78,7 @@ class ProcessOpenDota implements Callable<Void> {
                 }
             }
 
+            reportProgress(this.recordCounter, this.allDates.size(), this.startOfParsing);
             serializeData(data, output);
         } catch (IOException e) {
             e.printStackTrace();
@@ -228,150 +229,7 @@ class ProcessOpenDota implements Callable<Void> {
     }
 
     public static void main(String[] args) {
-
         CommandLine.call(new ProcessOpenDota(), args);
-
-//        FileReader fileReader = null;
-//        try {
-//            fileReader = new FileReader(inputPath);
-//            Iterator<String[]> csvReader = CsvParser.iterator(fileReader);
-//            String[] headers = csvReader.next();
-//
-//            // Iterate through stuff
-//            while (csvReader.hasNext()) {
-//                String[] row = csvReader.next();
-//
-//                // Extract relevant fields
-//                long start_time = Long.parseLong(row[3]);
-//                String pgroup = row[26];
-//
-//                // Parse date
-//                LocalDateTime dateTime = LocalDateTime.ofInstant(
-//                        Instant.ofEpochSecond(start_time),
-//                        ZoneId.of("UTC")
-//                );
-//                Long date = dateTime.toLocalDate().toEpochDay();
-//
-//                // Parse picks
-//                JsonIterator iterator = JsonIterator.parse(pgroup);
-//                ArrayList<Integer> heroes = new ArrayList<>();
-//
-//                Any whatever = iterator.read(Any.class);
-//                Map<String, Any> whateverMap = whatever.asMap();
-//                whateverMap.forEach((index , object) -> {
-//                    int heroId = object.get("hero_id").toInt();
-//                    heroes.add(heroId);
-//                });
-//
-//                THashMap<Integer, Integer> todayMap = map.getOrDefault(date, new THashMap<Integer, Integer>());
-//
-//                heroes.forEach(hero -> {
-//                    Integer count = todayMap.getOrDefault(hero, 0) + 1;
-//                    todayMap.put(hero, count);
-//                });
-//
-//                map.put(date, todayMap);
-//
-//
-//                // Tracking progress
-//                allDates.add(date);
-//                recordCounter++;
-//                if (recordCounter % 50000 == 0) {
-//                    //System.gc();
-//                    System.out.println("" + (recordCounter / 1000) + "K" + " - " + allDates.size() + " days");
-//                }
-//                if (recordCounter % 1000000 == 0) {
-//                    // Serialize!
-//                    FileOutputStream fos = new FileOutputStream(pathDir + "output_" + (recordCounter / 1000000) + ".ser");
-//                    ObjectOutputStream oos = new ObjectOutputStream(fos);
-//                    oos.writeObject(map);
-//                    oos.close();
-//                    fos.close();
-//                    System.out.println("Serialized HashMap data is saved in hashmap.ser");
-//                }
-//            }
-//
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-//        BufferedReader reader = null;
-//        try {
-//            reader = new BufferedReader(new FileReader(pathString));
-//
-//            String line;
-//            while ((line = reader.readLine()) != null)
-//            {
-////                LocalDateTime dateTime = LocalDateTime.ofInstant(
-////                        Instant.ofEpochSecond(start_time),
-////                        ZoneId.of("UTC")
-////                );
-////                Long date = dateTime.toLocalDate().toEpochDay();
-////
-////                allDates.add(date);
-//
-//                //System.out.println(map.size());
-//                recordCounter++;
-//                if (recordCounter % 50000 == 0) {
-//                    //System.gc();
-//                    System.out.println("" + (recordCounter / 1000) + "K" + " - " + allDates.size() + " days");
-//                }
-//            }
-//            reader.close();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-
-//        for(Record record: parser.iterateRecords(reader)) {
-//            long start_time = record.getLong("start_time");
-////            System.out.println(record.getValues()[record.getValues().length - 1]);
-//            LocalDateTime dateTime = LocalDateTime.ofInstant(
-//                    Instant.ofEpochSecond(start_time),
-//                    ZoneId.of("UTC")
-//            );
-//            Long date = dateTime.toLocalDate().toEpochDay();
-//            String pgroup = record.getString(26);
-//            JsonIterator iterator = JsonIterator.parse(pgroup);
-//
-//            ArrayList<Integer> heroes = new ArrayList<>();
-//
-//            try {
-//                Any whatever = iterator.read(Any.class);
-//                Map<String, Any> whateverMap = whatever.asMap();
-//                whateverMap.forEach((index , object) -> {
-//                    int heroId = object.get("hero_id").toInt();
-//                    heroes.add(heroId);
-//                });
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            THashMap<Integer, Integer> todayMap = map.getOrDefault(date, new THashMap<Integer, Integer>());
-////
-//            heroes.forEach(hero -> {
-//                Integer count = todayMap.getOrDefault(hero, 0) + 1;
-//                todayMap.put(hero, count);
-//            });
-//
-//            map.put(date, todayMap);
-//
-//            allDates.add(date);
-//
-//            //System.out.println(map.size());
-//            recordCounter++;
-//            if (recordCounter % 50000 == 0) {
-//                //System.gc();
-//                System.out.println("" + (recordCounter / 1000) + "K" + " - " + allDates.size() + " days");
-//            }
-//
-//        }
-
     }
 
     @Override
