@@ -25,7 +25,7 @@ from docopt import docopt
 
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__, version='OpenDotaDumpTools JSONtoCSV 0.2')
+    arguments = docopt(__doc__, version='OpenDotaDumpTools JsonToCsv 0.2')
 
     print("Starting OpenDotaDumpTools...")
 
