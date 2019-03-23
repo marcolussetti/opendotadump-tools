@@ -24,11 +24,11 @@ import java.util.concurrent.TimeUnit;
         version = "processopendota 0.3")
 class ProcessOpenDota implements Callable<Void> {
     // ARGUMENTS
-    @Option(names = { "-x", "--extract-to-json"},
+    @Option(names = {"-x", "--extract-to-json"},
             description = "Extract an existing .ser file to a JSON file.")
     private File extractToJson = null;
 
-    @Option(names = { "-c", "--condense"},
+    @Option(names = {"-c", "--condense"},
             description = "Condense the input openDota CSV file. If file is GunZipped (.gz), extract it first.")
     private File condense = null;
 
@@ -39,8 +39,8 @@ class ProcessOpenDota implements Callable<Void> {
     // CONSTANTS
     public static final int MATCHES_NO = 1191768403;
     public static final int DAYS_NO = 1859;
-    public static final int REPORT_THRESHOLD = 250000; // Report progress every 250K rows
-    public static final int SERIALIZE_THRESHOLD = 1000000; // Serialize every million rows
+    public static final int REPORT_THRESHOLD = 1000000; // Report progress every million rows
+    public static final int SERIALIZE_THRESHOLD = 10000000; // Serialize every 10 million rows
 
     // VARIABLES
     // Keep track of progress
@@ -135,7 +135,7 @@ class ProcessOpenDota implements Callable<Void> {
             e.printStackTrace();
         }
 
-        jsonObject.forEach((index , object) -> {
+        jsonObject.forEach((index, object) -> {
             int heroId = object.get("hero_id").toInt();
             heroes.add(heroId);
         });
@@ -152,14 +152,14 @@ class ProcessOpenDota implements Callable<Void> {
 
         System.out.printf(
                 "\n%s (%s elapsed - %s remaining) | %9.2f rows/s | %,6.2f million rows (%6.2f%%)| %4d days (%6.2f%%)",
-                dtf.format(LocalDateTime.now()),
-                formatTimeDifference(elapsedMillis),
-                formatTimeDifference((long) ((MATCHES_NO - recordCounter) / rowsPerSec * 1000)),
-                (double) recordCounter / elapsedMillis * 1000,
-                recordCounter / 1000000.0,
-                recordCounter / 1000000.0 / MATCHES_NO,
-                days,
-                days / (float) DAYS_NO
+                dtf.format(LocalDateTime.now()),                                                // current time
+                formatTimeDifference(elapsedMillis),                                            // elapsed time
+                formatTimeDifference((long) ((MATCHES_NO - recordCounter) / rowsPerSec * 1000)),// remaining time (est.)
+                (double) recordCounter / elapsedMillis * 1000,                                  // rows per second
+                (double) recordCounter / 1000000,                                               // rows processed (mils)
+                (double) recordCounter / MATCHES_NO * 100,                                      // % of rows processed
+                days,                                                                           // days tracked
+                days / (float) DAYS_NO * 100                                                    // % of days tracked
         );
     }
 
@@ -192,17 +192,16 @@ class ProcessOpenDota implements Callable<Void> {
     public static THashMap<Long, THashMap<Integer, Integer>> deserializeData(File file) {
         // From https://beginnersbook.com/2013/12/how-to-serialize-hashmap-in-java/
         THashMap<Long, THashMap<Integer, Integer>> hashMap;
-        try
-        {
+        try {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);
             hashMap = (THashMap<Long, THashMap<Integer, Integer>>) ois.readObject();
             ois.close();
             fis.close();
-        }catch(IOException ioe) {
+        } catch (IOException ioe) {
             ioe.printStackTrace();
             return null;
-        }catch(ClassNotFoundException c) {
+        } catch (ClassNotFoundException c) {
             System.out.println("Class not found");
             c.printStackTrace();
             return null;
@@ -326,7 +325,6 @@ class ProcessOpenDota implements Callable<Void> {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-
 
 
 //        for(Record record: parser.iterateRecords(reader)) {
