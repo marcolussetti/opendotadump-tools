@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9c2387e9-126d-417c-b809-2e522a9b2d21" name="Default Changelist" comment="" />
+    <list default="true" id="9c2387e9-126d-417c-b809-2e522a9b2d21" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/opendota_jsontocsv.py" beforeDir="false" afterPath="$PROJECT_DIR$/opendota_jsontocsv.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/opendota_jsontocsv.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="773">
-              <caret line="78" lean-forward="true" selection-start-line="78" selection-end-line="78" />
+            <state relative-caret-position="255">
+              <caret line="15" column="7" selection-start-line="15" selection-start-column="7" selection-end-line="15" selection-end-column="7" />
               <folding>
                 <element signature="e#507#522#0" expanded="true" />
               </folding>

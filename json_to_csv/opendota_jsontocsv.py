@@ -2,9 +2,9 @@
 """OPENDOTA_JSONTOCSV
 
 Usage:
-    opendota_jsontocsv.py JSON_INPUT_FILE CSV_OUTPUT_FILE [--heroes=(names|numbers)] [(-n | --normalize)] [--remove-low-counts]
-    opendota_jsontocsv.py JSON_INPUT_FILE CSV_OUTPUT_FILE --picks-by-hero [--remove-low-counts] [--heroes=(names|numbers)]
-    opendota_jsontocsv.py JSON_INPUT_FILE CSV_OUTPUT_FILE --picks-by-date [--remove-low-counts]
+    opendota_jsontocsv.py JSON_INPUT_FILE CSV_OUTPUT_FILE [--heroes=(names|numbers)] [(-n | --normalize)] [(-r | --remove-low-counts)]
+    opendota_jsontocsv.py JSON_INPUT_FILE CSV_OUTPUT_FILE --picks-by-hero [--remove-low-counts] [--heroes=(names|numbers)] [(-r | --remove-low-counts)]
+    opendota_jsontocsv.py JSON_INPUT_FILE CSV_OUTPUT_FILE --picks-by-date [--remove-low-counts] [(-r | --remove-low-counts)]
     opendota_jsontocsv.py (-h | --help)
     opendota_jsontocsv.py --version
 
@@ -13,7 +13,7 @@ Options:
     --version                   Show version.
     --heroes=(names|numbers)    Record heroes by name or number [default: names].
     -n --normalize              Normalize picks as proportion of picks per day.
-    --remove-low-counts         Removes early records (pre 2011-11-22) as they have lower volumes of recorded matches.
+    -r --remove-low-counts         Removes early records (pre 2011-11-22) as they have lower volumes of recorded matches.
     --picks-by-date             Export the number of picks for each day to CSV.
     --picks-by-hero             Export the number of picks for each hero to CSV.
 """
@@ -39,14 +39,15 @@ if __name__ == '__main__':
     df = df.drop(0, 1)  # Remove entries with a missing hero (0)
     df.index = [datetime.datetime(1970, 1, 1, 0, 0) + datetime.timedelta(index - 1)
                 for index in df.index]  # Convert index (epoch days) to time
-    df = df.reindex(sorted(df.columns), axis=1)  # Order columns in ascending order
+    df = df.reindex(sorted(df.columns), axis=1)  # Order columns by hero #, ascending
+    df = df.sort_index(axis=0)  # Order rows by date, ascending
     for column in df.columns:  # Convert all values from float to integer
         df[column] = df[column].astype('int64')
     print("Input cleaned")
 
     if arguments["--remove-low-counts"]:
-        df = df.loc[df.index >= '2011-11-22 00:00:00']
-        print("Data for days previous to 2011-11-22 removed")
+        df = df.loc[df.index > '2011-11-22 00:00:00']
+        print("Data for days previous to 2011-11-23 removed")
 
     # EXPORT
     if arguments["--picks-by-date"]:
