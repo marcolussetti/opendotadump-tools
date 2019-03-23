@@ -9,6 +9,7 @@ import org.simpleflatmapper.csv.CsvParser;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 
 import java.io.*;
 import java.time.*;
@@ -23,17 +24,21 @@ import java.util.concurrent.TimeUnit;
         version = "processopendota 0.3")
 class ProcessOpenDota implements Callable<Void> {
     // ARGUMENTS
-    @Option(names = { "-x", "--extract-to-json"}, description = "Extract a .ser file to a JSON file.")
+    @Option(names = { "-x", "--extract-to-json"},
+            description = "Extract an existing .ser file to a JSON file.")
     private File extractToJson = null;
 
-    @Option(names = { "-c", "--condense"}, description = "Condense the input openDota CSV file.")
+    @Option(names = { "-c", "--condense"},
+            description = "Condense the input openDota CSV file. If file is GunZipped (.gz), extract it first.")
     private File condense = null;
+
+    @CommandLine.Parameters(paramLabel = "OUTPUT",
+            description = "Output file for either extract or condense")
+    private File output;
 
 
     // CONSTANTS
     public static final int MATCHES_NO = 1191768403;
-    public static final String inputPath = "D://datasets//opendota//matches"; // This is a file
-    public static final String outputPath = "D://datasets//opendota//output//"; // This is a directory
     public static final int DAYS_NO = 1859;
     public static final int REPORT_THRESHOLD = 100000; // Report progress every 100K rows
     public static final int SERIALIZE_THRESHOLD = 1000000; // Serialize every million rows
@@ -48,13 +53,13 @@ class ProcessOpenDota implements Callable<Void> {
 
 
 
-    private void condenseInputFile(File file) {
+    private void condenseInputFile(File input, File output) {
         this.startOfParsing = LocalDateTime.now();
 
         // Main loop!
         FileReader fileReader;
         try {
-            fileReader = new FileReader(file);
+            fileReader = new FileReader(input);
             Iterator<String[]> csvReader = CsvParser.iterator(fileReader);
             String[] headers = csvReader.next();
             // Iterate through stuff
@@ -67,7 +72,10 @@ class ProcessOpenDota implements Callable<Void> {
                     reportProgress(this.recordCounter, this.allDates.size(), this.startOfParsing);
 
                     if (recordCounter % SERIALIZE_THRESHOLD == 0) {
-                        String serializePath = outputPath + "intermediate_" + (recordCounter % SERIALIZE_THRESHOLD) + ".ser";
+                        String destFolder = output.getParent();
+                        String[] destFile = output.getName().split(".");
+
+                        String serializePath = output.getParent() + "intermediate_" + (recordCounter % SERIALIZE_THRESHOLD) + ".ser";
                         serializeData(data, serializePath);
                     }
                 }
@@ -83,8 +91,8 @@ class ProcessOpenDota implements Callable<Void> {
 
     }
 
-    private void extractToJson(File file) {
-        THashMap<Long, THashMap<Integer, Integer>> hashMap = deserializeData(file);
+    private void extractToJson(File input, File output) {
+        THashMap<Long, THashMap<Integer, Integer>> hashMap = deserializeData(input);
 
         writeJSON(hashMap, outputPath + "output.json");
     }
@@ -378,8 +386,19 @@ class ProcessOpenDota implements Callable<Void> {
     public Void call() throws Exception {
         // BUSINESS LOGIC
 
-        if (extractToJson != null) {
+        if (output == null) {
+            System.out.println("Must provide an output file!");
+            return null;
+        }
+        if (extractToJson == null && condense == null) {
+            System.out.println("Well you need to select something... try --help");
+        }
 
+        if (extractToJson != null) {
+            extractToJson(extractToJson, output);
+        }
+        if (condense != null) {
+            condenseInputFile(condense, output);
         }
         return null;
     }
