@@ -1,4 +1,4 @@
-package com.marcolussetti.opendotadumptools;
+package com.marcolussetti.opendotamatchescondenser;
 
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;

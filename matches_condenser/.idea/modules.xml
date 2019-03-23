@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/opendotadumptools.iml" filepath="$PROJECT_DIR$/opendotadumptools.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opendotamatchescondenser.iml" filepath="$PROJECT_DIR$/opendotamatchescondenser.iml" />
     </modules>
   </component>
 </project>
