@@ -32,6 +32,10 @@ class ProcessOpenDota implements Callable<Void> {
             description = "Condense the input openDota CSV file. If file is GunZipped (.gz), extract it first.")
     private File condense = null;
 
+    @Option(names = {"-o", "--only-count"},
+            description = "Only count picks, do not record wins & losses")
+    private Boolean onlyCount = false;
+
     @Parameters(paramLabel = "OUTPUT",
             description = "Output file for either extract or condense")
     private File output = null;
@@ -48,9 +52,9 @@ class ProcessOpenDota implements Callable<Void> {
     private THashSet<Long> allDates = new THashSet<>();
     private int recordCounter = 0;
     // Store the data {date: Long, {hero#: int -> picks# int}}
-    private THashMap<Long, THashMap<Integer, Integer>> data = new THashMap<>();
+    private THashMap<Long, THashMap<Integer, Integer[]>> data = new THashMap<>();
 
-    private void condenseInputFile(File input, File output) {
+    private void condenseInputFile(File input, File output, boolean onlyCount) {
         this.startOfParsing = LocalDateTime.now();
 
         // Main loop!
@@ -63,7 +67,7 @@ class ProcessOpenDota implements Callable<Void> {
             while (csvReader.hasNext()) {
                 String[] row = csvReader.next();
 
-                parseRow(row);
+                parseRow(row, onlyCount);
 
                 if (recordCounter % REPORT_THRESHOLD == 0) {
                     reportProgress(this.recordCounter, this.allDates.size(), this.startOfParsing);
@@ -87,27 +91,35 @@ class ProcessOpenDota implements Callable<Void> {
     }
 
     private void extractToJson(File input, File output) {
-        THashMap<Long, THashMap<Integer, Integer>> hashMap = deserializeData(input);
+        THashMap<Long, THashMap<Integer, Integer[]>> hashMap = deserializeData(input);
 
         writeJSON(hashMap, output);
     }
 
-    private void parseRow(String[] row) {
+    private void parseRow(String[] row, boolean onlyCount) {
         // Extract relevant fields
         long startTime = Long.parseLong(row[3]);
         String pgroup = row[26];
+        boolean radiantWin = row[2].equals("t");
 
         // Parse date
         Long date = extractDate(startTime).toEpochDay();
 
         // Parse picks
-        ArrayList<Integer> heroesPicked = extractHeroesPicked(pgroup);
+        ArrayList<Integer[]> heroesPicked = extractHeroesPicked(pgroup, radiantWin);
 
         // Update copy of local map
-        THashMap<Integer, Integer> todayPicks = this.data.getOrDefault(date, new THashMap<Integer, Integer>());
-        heroesPicked.forEach(hero -> {
-            Integer count = todayPicks.getOrDefault(hero, 0) + 1;
-            todayPicks.put(hero, count);
+        THashMap<Integer, Integer[]> todayPicks = this.data.getOrDefault(date, new THashMap<Integer, Integer[]>());
+        heroesPicked.forEach(heroRecord -> {
+            int hero = heroRecord[0];
+            boolean won = heroRecord[1] == 1;
+
+            Integer[] counts = todayPicks.getOrDefault(hero, new Integer[]{0, 0});
+            if (onlyCount || won)
+                counts[0] += 1;
+            else
+                counts[1] += 1;
+            todayPicks.put(hero, counts);
         });
 
         // Push to global map
@@ -125,8 +137,8 @@ class ProcessOpenDota implements Callable<Void> {
         ).toLocalDate();
     }
 
-    private static ArrayList<Integer> extractHeroesPicked(String jsonInput) {
-        ArrayList<Integer> heroes = new ArrayList<>();
+    private static ArrayList<Integer[]> extractHeroesPicked(String jsonInput, boolean radiantWon) {
+        ArrayList<Integer[]> heroes = new ArrayList<>();
 
         JsonIterator iterator = JsonIterator.parse(jsonInput);
         Map<String, Any> jsonObject = null;
@@ -138,7 +150,9 @@ class ProcessOpenDota implements Callable<Void> {
 
         jsonObject.forEach((index, object) -> {
             int heroId = object.get("hero_id").toInt();
-            heroes.add(heroId);
+            boolean isRadiant = object.get("player_slot").toInt() <= 127;
+            Integer[] heroRecord = {heroId, ((isRadiant && radiantWon) || (!isRadiant && !radiantWon)) ? 1 : 0 };
+            heroes.add(heroRecord);
         });
 
         return heroes;
@@ -174,7 +188,7 @@ class ProcessOpenDota implements Callable<Void> {
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
     }
 
-    private static void serializeData(THashMap<Long, THashMap<Integer, Integer>> data, File output) {
+    private static void serializeData(THashMap<Long, THashMap<Integer, Integer[]>> data, File output) {
 
         // From https://beginnersbook.com/2013/12/how-to-serialize-hashmap-in-java/
         FileOutputStream fos = null;
@@ -190,13 +204,13 @@ class ProcessOpenDota implements Callable<Void> {
         System.out.print("\n> Saved data to " + output.getAbsolutePath());
     }
 
-    public static THashMap<Long, THashMap<Integer, Integer>> deserializeData(File file) {
+    public static THashMap<Long, THashMap<Integer, Integer[]>> deserializeData(File file) {
         // From https://beginnersbook.com/2013/12/how-to-serialize-hashmap-in-java/
-        THashMap<Long, THashMap<Integer, Integer>> hashMap;
+        THashMap<Long, THashMap<Integer, Integer[]>> hashMap;
         try {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            hashMap = (THashMap<Long, THashMap<Integer, Integer>>) ois.readObject();
+            hashMap = (THashMap<Long, THashMap<Integer, Integer[]>>) ois.readObject();
             ois.close();
             fis.close();
         } catch (IOException ioe) {
@@ -210,7 +224,7 @@ class ProcessOpenDota implements Callable<Void> {
         return hashMap;
     }
 
-    public static void writeJSON(THashMap<Long, THashMap<Integer, Integer>> hashMap, File outputFile) {
+    public static void writeJSON(THashMap<Long, THashMap<Integer, Integer[]>> hashMap, File outputFile) {
 
         String output = JsonStream.serialize(hashMap);
         try {
@@ -256,7 +270,7 @@ class ProcessOpenDota implements Callable<Void> {
         }
         if (condense != null) {
             System.out.println("Condensing from CSV to SER");
-            condenseInputFile(condense, output);
+            condenseInputFile(condense, output, onlyCount);
             System.out.println("Condensing complete: " + output.getAbsolutePath());
         }
 
