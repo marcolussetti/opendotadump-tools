@@ -2,7 +2,7 @@
 
 This repository hosts some tools and analysis performed on the [second OpenDota Data Dump][opendota-data-dump].
 
-These tools and analysis were presented as a [poster][poster-download] at the [TRU Undergraduate Research & Innovation Conference 2019][undegrad-conference-session].
+These tools and analysis were presented as a [poster][poster-download] at the [TRU Undergraduate Research & Innovation Conference 2019][undergrad-conference-session].
 
 ## Data Set
 
@@ -18,6 +18,14 @@ The format of the dataset is described on the [OpenDota project wiki][opendotadu
 match_id,match_seq_num,radiant_win,start_time,duration,tower_status_radiant,tower_status_dire,barracks_status_radiant,barracks_status_dire,cluster,first_blood_time,lobby_type,human_players,leagueid,positive_votes,negative_votes,game_mode,engine,picks_bans,parse_status,chat,objectives,radiant_gold_adv,radiant_xp_adv,teamfights,version,pgroup
 2304340261,2019317886,t,1461013929,1701,1975,4,63,3,155,100,0,10,0,0,0,1,1,,3,,,,,,,"{""0"":{""account_id"":4294967295,""hero_id"":93,""player_slot"":0},""1"":{""account_id"":4294967295,""hero_id"":75,""player_slot"":1},""2"":{""account_id"":4294967295,""hero_id"":19,""player_slot"":2},""3"":{""account_id"":4294967295,""hero_id"":44,""player_slot"":3},""4"":{""account_id"":4294967295,""hero_id"":7,""player_slot"":4},""128"":{""account_id"":4294967295,""hero_id"":46,""player_slot"":128},""129"":{""account_id"":45475622,""hero_id"":38,""player_slot"":129},""130"":{""account_id"":4294967295,""hero_id"":52,""player_slot"":130},""131"":{""account_id"":4294967295,""hero_id"":43,""player_slot"":131},""132"":{""account_id"":4294967295,""hero_id"":60,""player_slot"":132}}"
 ```
+
+## Generated (condensed) Data Sets
+
+The condensed versions produced with our tools (see below) are available on this repository:
+
+- [Pick Rates Per Hero Per Day][data-heroespicks]
+- [Wins and Losses per Hero Per Day][data-heroeswinratios]
+- [Unprocessed JSONs & SER files][data-condensedmatches] (direct output of the MatchesCondenser tool)
 
 ## Tools
 
@@ -35,12 +43,44 @@ Temporarily we have two Jupyter Notebooks that do so: [OpenDota_Picks_JSON_to_CS
 
 Our analysis has been done via Jupyter Notebooks which we must note are not yet cleaned up well: both the graph generation for the production of our poster as well as exploratory data analysis are still grouped together in the notebooks, and it takes quite a while to generate these graphs. We fully intend on cleaning up these notebooks in the upcoming weeks.
 
-- 
-- [GraphPicks][analysis-graphpicks] [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/marcolussetti/opendotadump-tools/blob/master/analysis/heroes_picks/GraphPicks.ipynb]- This notebook was the main exploratory analysis tool, and produced the early graphs
+Please also note that due to the versions of various libraries needed by Plotnine and the versions provided in Google Colab, you will need to run the pip commands at the top of the notebook and then reload the runtime once before running the notebook through. If running through the entire notebook, please be aware that the large graph size and the complexity of the graphs mean that it may take quite a while to run through it.
+
+- [LookupSpikes][analysis-lookupspikes] [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)][analysis-lookupspikes-colab]: This notebook is the closest thing to a usable analysis tool. It's a WIP cleanup of the GraphPicks (see below) original notebook, but it needs a lot of cleaning still.
+- [GraphPicks][analysis-graphpicks] [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)][analysis-graphpicks-colab]: This notebook was the main exploratory analysis tool, and produced the early graphs
+- [GraphWinRatios][analysis-graphwinratios] [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)][analysis-graphwinratios-colab]: This notebook was the main exploratory tool for looking at Win Ratios
 
 ## Other Components
 
-## References
+### Poster
+
+As mentioned above, we had the privilege of presenting a poster at the [TRU Undergraduate Research & Innovation Conference 2019][undegrad-conference-session]. The tools and source files used in generating the poster are included in this repository.
+
+- [Poster directory][poster-dir]
+- [Poster as a PDF][poster-pdf]
+
+### Prints
+
+We also produced a number of smaller prints for explanatory purposes that we brought along to the conference.
+
+- [Prints directory][prints-dir]
+- [Explain peaks in poster by listing contributory hero pick rate shifts][prints-explain]
+- [MatchesCondenser source code as PDF][prints-sourcecode]
+- [Top 10 Most Popular Heroes - Pick Rate][prints-mostpopular]
+- [Heroes with the highest variation in picks - Pick Rate][prints-variability]
+- [Win Ratios for all heroes][prints-winratio]
+- [Win Ratio Differences][prints-winratio-difference]
+
+## Citation
+
+If for any reason you wish to cite this work, we suggest using our poster's presentation as base:
+
+Lussetti, M., & Fraser, D. (2019, March 29). *Big Data Reduction: Lessons Learned from Analyzing One Billion Dota 2 Matches*. Presented at the 14th annual TRU Undergraduate Research & Innovation Conference, Kamloops, Canada. Retrieved from https://digitalcommons.library.tru.ca/urc/2019/postersb/26
+
+`
+Lussetti, M., & Fraser, D. (2019, March 29). Big Data Reduction: Lessons Learned from Analyzing One Billion Dota 2 Matches. Presented at the 14th annual TRU Undergraduate Research & Innovation Conference, Kamloops, Canada. Retrieved from https://digitalcommons.library.tru.ca/urc/2019/postersb/26
+`
+
+
 
 [opendota-data-dump]: https://blog.opendota.com/2017/03/24/datadump2/	"The OpenDota Project. (2017, March 24). Data Dump (March 2011 to March 2016). Retrieved February 25, 2019, from OpenDota website: https://blog.opendota.com/2017/03/24/datadump2/"
 [poster-download]:  https://github.com/marcolussetti/opendotadump-tools/releases/download/poster-v1.1/poster_LussettiMarco_FraserDyson_48x36_CORRECTED.pdf
@@ -53,3 +93,21 @@ Our analysis has been done via Jupyter Notebooks which we must note are not yet 
 [json-to-csv]: https://github.com/marcolussetti/opendotadump-tools/blob/master/json_to_csv/opendota_jsontocsv.py
 [json-to-csv-picks]: https://github.com/marcolussetti/opendotadump-tools/blob/master/analysis/heroes_winratio/OpenDota_Picks_JSON_to_CSV.ipynb
 [json-to-csv-winratios]: https://github.com/marcolussetti/opendotadump-tools/blob/master/analysis/heroes_winratio/OpenDota_Picks_JSON_to_CSV_winratio.ipynb
+[analysis-lookupspikes]: https://github.com/marcolussetti/opendotadump-tools/blob/master/analysis/heroes_picks/LookupSpikes.ipynb
+[analysis-lookupspikes-colab]: https://colab.research.google.com/github/marcolussetti/opendotadump-tools/blob/master/analysis/heroes_picks/LookupSpikes.ipynb
+[analysis-graphpicks]: https://github.com/marcolussetti/opendotadump-tools/blob/master/analysis/heroes_picks/GraphPicks.ipynb
+[analysis-graphpicks-colab]: https://colab.research.google.com/github/marcolussetti/opendotadump-tools/blob/master/analysis/heroes_picks/GraphPicks.ipynb
+[analysis-graphwinratios]: https://github.com/marcolussetti/opendotadump-tools/blob/master/analysis/heroes_winratio/GraphWinRatios.ipynb
+[analysis-graphwinratios-colab]: https://colab.research.google.com/github/marcolussetti/opendotadump-tools/blob/master/analysis/heroes_winratio/GraphWinRatios.ipynb
+[data-heroespicks]: https://github.com/marcolussetti/opendotadump-tools/tree/master/data/heroes_picks_csvs
+[data-heroeswinratios]: https://github.com/marcolussetti/opendotadump-tools/tree/master/data/heroes_winratio_csvs
+[data-condensedmatches]: https://github.com/marcolussetti/opendotadump-tools/tree/master/data/condensed_matches_data
+[poster-pdf]: https://github.com/marcolussetti/opendotadump-tools/blob/master/poster/poster_LussettiMarco_FraserDyson_48x36_CORRECTED.pdf
+[poster-dir]: https://github.com/marcolussetti/opendotadump-tools/tree/master/poster
+[prints-dir]: https://github.com/marcolussetti/opendotadump-tools/tree/master/prints
+[prints-explain]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/explain_peaks/explain_horizontal.pdf
+[prints-sourcecode]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/matches_condenser_source_code/Java_11x17.pdf
+[prints-mostpopular]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/picks_most_popular/most_popular_champions.pdf
+[prints-variability]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/picks_highest_variability_heroes/highest_variability_champions.pdf
+[prints-winratio]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/winratios_all/WinRatios.pdf
+[prints-winratio-difference]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/winratios_differences/win_ratio_differences.pdf
