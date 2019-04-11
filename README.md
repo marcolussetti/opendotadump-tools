@@ -4,6 +4,8 @@ This repository hosts some tools and analysis performed on the [second OpenDota 
 
 These tools and analysis were presented as a [poster][poster-download] at the [TRU Undergraduate Research & Innovation Conference 2019][undergrad-conference-session].
 
+We also presented these results as two presentations [in class][comp4610-presentation] and at the [TRU Computing Science Showcase - Winter 2019][showcase-presentation].
+
 ## Data Set
 
 The data set used for this analysis is the `matches` file from the aforementioned Open Dota Data Dump. It includes over one billion matches from March 2011 to March 2016. You can download a [sample][matches-sample] (3GB) or the [full file][matches-full] (157GB compressed, 1.2TB uncompressed). The sample file and the full file maintain the same structure as CSV files. We suggest using the sample file for exploring the data before switching to the full file.
@@ -111,3 +113,5 @@ Lussetti, M., & Fraser, D. (2019, March 29). Big Data Reduction: Lessons Learned
 [prints-variability]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/picks_highest_variability_heroes/highest_variability_champions.pdf
 [prints-winratio]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/winratios_all/WinRatios.pdf
 [prints-winratio-difference]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/winratios_differences/win_ratio_differences.pdf
+[comp4610-presentation]: http://sno.cc/comp4610
+[showcase-presentation]: http://sno.cc/showcase2019
