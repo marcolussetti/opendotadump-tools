@@ -143,9 +143,11 @@
 
 \addtocounter{page}{1} % Start counting at title page
 
-\emph{Note \#1:} this report is based on our work as submitted in the course of our previous submissions during the course as well as our submission to the TRU Undergraduate Conference. We have omitted direct citations to the submission outside of this paragraph for convenience purposes and as they form the same body of work \cite{lussettiBigDataReduction2019}.
-
-\emph{Note \#2:} the full source code for this report, as well as for the poster, and the implementation of utilities \& analysis necessary for this project are available on GitHub at \href{https://github.com/marcolussetti/opendotadump-tools}{marcolussetti/opendotadump-tools}. This includes a README pointing to the key files and folders in the repository.
+\begin{mdframed}[linewidth=2pt]
+	\emph{Note \#1:} this report is based on our work as submitted in the course of our previous submissions during the course as well as our submission to the TRU Undergraduate Conference. We have omitted direct citations to the submission outside of this paragraph for convenience purposes and as they form the same body of work \cite{lussettiBigDataReduction2019}.
+	
+	\emph{Note \#2:} the full source code for this report, as well as for the poster, and the implementation of utilities \& analysis necessary for this project are available on GitHub at \href{https://github.com/marcolussetti/opendotadump-tools}{marcolussetti/opendotadump-tools}. This includes a README pointing to the key files and folders in the repository.
+\end{mdframed}
 
 \section{Introduction} % DONE
 
@@ -163,6 +165,11 @@ The state of viability for a hero varies as time passes. If a hero is picked too
 
 \subsection{Research Objectives} % DONE
 
+\begin{itemize}
+    \item Detect metagame shifts from hero pick ratios, that would be caused by external events (patches to the game, major tournaments, etc.)
+    \item “Tame” the dataset’s enormity using the simplest tools possible, and using only the resource of a normal machine as may be available to an average researcher without extensive funding
+\end{itemize}
+
 \section{Methodology} % DONE
 
 \subsection{Materials} % DONE
@@ -175,7 +182,7 @@ The \emph{matches} file is a comma-separated value file with 27 columns, one of 
   \centering
     \caption{Fields in $matches$ file}
     \label{fig:matchesFile}
-    \begin{mdframed}
+    \begin{mdframed}[linewidth=2pt]
         \begin{multicols}{2}
             \begin{itemize}
                 \item $match\_id$
@@ -233,7 +240,7 @@ The input file we are seeking to process is a comma separated value file. We ori
 
 The $pgroup$ field is an embedded JSON field so we chose to rely on Jsoniter \cite{wenJsoniterJsoniterator2019} as a JSON parser. The library's performance appeared adequate so we did not investigated the matter significantly. We liked that it did not strongly bound to classes unlike some other libraries thus allowing for faster prototyping.
 
-We also investigated more memory-efficient data structures for holding the resulting data, for which we relied on Palantir's Trove4J library which produces some interesting memory efficiency gains for HashMaps \cite{vorontsovTroveLibraryUsing2014}. However, this proved to be a premature optimization that was wholly unnecessary due to the small size of the HashMaps used in the program.
+We also investigated more memory-efficient data structures for holding the resulting data, for which we relied on Trove4J \cite{edenGNUTroveTrove4j2013} library which produces some interesting memory efficiency gains for HashMaps \cite{vorontsovTroveLibraryUsing2014}. However, this proved to be a premature optimization that was wholly unnecessary due to the small size of the HashMaps used in the program.
 
 Last we should note that we relied on picocli \cite{popmaPicocli2019} for the command line interface implementation.
 
@@ -273,7 +280,7 @@ From our analysis of the Manhattan distance of each day to the running average o
     \centering
     \caption{List of major metagame shifts}
     \label{fig:patches-list}
-    \begin{mdframed}
+    \begin{mdframed}[linewidth=2pt]
         \begin{itemize}
             \item \emph{2012-01-12} Major rebalancing of heroes \& item changes (\nameref{fig:20120112})
             \item \emph{2012-06-11} Chaos Knight, Phantom Assassin, Gyrocopter released (\nameref{fig:20120611})
