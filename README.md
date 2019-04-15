@@ -6,6 +6,8 @@ These tools and analysis were presented as a [poster][poster-download] at the [T
 
 We also presented these results as two presentations [in class][comp4610-presentation] and at the [TRU Computing Science Showcase - Winter 2019][showcase-presentation].
 
+We submitted [a report][comp4610-report] as part of our class that is an expanded version of the previously submitted work.
+
 ## Data Set
 
 The data set used for this analysis is the `matches` file from the aforementioned Open Dota Data Dump. It includes over one billion matches from March 2011 to March 2016. You can download a [sample][matches-sample] (3GB) or the [full file][matches-full] (157GB compressed, 1.2TB uncompressed). The sample file and the full file maintain the same structure as CSV files. We suggest using the sample file for exploring the data before switching to the full file.
@@ -115,3 +117,4 @@ Lussetti, M., & Fraser, D. (2019, March 29). Big Data Reduction: Lessons Learned
 [prints-winratio-difference]: https://github.com/marcolussetti/opendotadump-tools/blob/master/prints/winratios_differences/win_ratio_differences.pdf
 [comp4610-presentation]: http://sno.cc/comp4610
 [showcase-presentation]: http://sno.cc/showcase2019
+[comp4610-report]:https://github.com/marcolussetti/opendotadump-tools/blob/master/report/main.pdf
