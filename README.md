@@ -35,7 +35,7 @@ The condensed versions produced with our tools (see below) are available on this
 
 ### Matches Condenser
 
-Our [Matches Condenser tool](matches-condenser) is a Java tool that condenses the matches file by performing dimensionality and granularity reduction. Depending on the arguments used, it will either produce a JSON of picks per hero per day, or wins and losses per hero per day. We intend to expand this tool to allow for more metadata to be retained, particularly on matches duration. The last stable release available as a [JAR](matches-condenser-release) only produces picks per day and is meant for use with the JSON to CSV tool.
+Our [Matches Condenser tool][matches-condenser] is a Java tool that condenses the matches file by performing dimensionality and granularity reduction. Depending on the arguments used, it will either produce a JSON of picks per hero per day, or wins and losses per hero per day. We intend to expand this tool to allow for more metadata to be retained, particularly on matches duration. The last stable release available as a [JAR][matches-condenser-release] only produces picks per day and is meant for use with the JSON to CSV tool.
 
 ### JSON to CSV
 
@@ -45,7 +45,7 @@ Temporarily we have two Jupyter Notebooks that do so: [OpenDota_Picks_JSON_to_CS
 
 ## Analysis
 
-Our analysis has been done via Jupyter Notebooks which we must note are not yet cleaned up well: both the graph generation for the production of our poster as well as exploratory data analysis are still grouped together in the notebooks, and it takes quite a while to generate these graphs. We fully intend on cleaning up these notebooks in the upcoming weeks.
+Our analysis has been done via Jupyter Notebooks which we must note are not yet cleaned up well: both the graph generation for the production of our poster as well as exploratory data analysis are still grouped together in the notebooks, and it takes quite a while to generate these graphs. We fully intend on cleaning up these notebooks in the future.
 
 Please also note that due to the versions of various libraries needed by Plotnine and the versions provided in Google Colab, you will need to run the pip commands at the top of the notebook and then reload the runtime once before running the notebook through. If running through the entire notebook, please be aware that the large graph size and the complexity of the graphs mean that it may take quite a while to run through it.
 
